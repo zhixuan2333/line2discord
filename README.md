@@ -4,10 +4,7 @@
 
 ## How to use
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https%3A%2F%2Fgithub.com%2Fzhixuan2333%2Fline2discord&plugins=postgresql&envs=GUILD_ID%2CPARENT_ID%2CLINE_CHANNEL_SECRET%2CLINE_CHANNEL_TOKEN%2CDISCORD_TOKEN&referralCode=l7uav7)
-
-See quickstart.md
-
+See [quickstart.md](./docs/quickstart.md)
 
 ## features
 
@@ -27,8 +24,10 @@ See quickstart.md
 
 ## Contributing
 
-Coming soon...
-<!-- See [CONTRIBUTING.md](./.github/CONTRIBUTING.md) -->
+### Writing Commit Messages
+
+We use [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) (also known as semantic commits) to ensure consistent and descriptive commit messages.
+
 ## License
 
 Licensed under the [MIT License](./LICENSE).
