@@ -7,7 +7,7 @@
 - A discord bot
 - A container
 
-if you what do L2D whitout yout own container or database. Please see [here]()
+if you what use L2D whitout yout own container or database. Please see [here](./starter/railway.md)
 
 ## Configure L2D
 
