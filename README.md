@@ -1,9 +1,13 @@
 # Line2Discord (*L2D*)
 
-<!-- 
-![L2D](./image/L2D.png)
-<img src="https://github.com/zhixuan2333/L/raw/master/logo/logo.png" width="100">
- -->
+<img src="https://raw.githubusercontent.com/zhixuan2333/line2discord/master/image/L2D.png" width="100">
+
+## How to use
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https%3A%2F%2Fgithub.com%2Fzhixuan2333%2Fline2discord&plugins=postgresql&envs=GUILD_ID%2CPARENT_ID%2CLINE_CHANNEL_SECRET%2CLINE_CHANNEL_TOKEN%2CDISCORD_TOKEN&referralCode=l7uav7)
+
+See quickstart.md
+
 
 ## features
 
