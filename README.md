@@ -4,7 +4,7 @@
 
 ## Preview
 
-<!-- ![Preview](./resource/l2d_video.mp4) -->
+![Preview](./resource/l2d_video.gif)
 
 ## How to use
 
