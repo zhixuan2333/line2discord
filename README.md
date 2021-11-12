@@ -1,6 +1,10 @@
 # Line2Discord (*L2D*)
 
-<img src="https://raw.githubusercontent.com/zhixuan2333/line2discord/master/image/L2D.png" width="100">
+<img src="https://raw.githubusercontent.com/zhixuan2333/line2discord/master/resource/L2D.png" width="100">
+
+## Preview
+
+<!-- ![Preview](./resource/l2d_video.mp4) -->
 
 ## How to use
 
