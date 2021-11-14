@@ -15,14 +15,14 @@ See [quickstart.md](./docs/quickstart.md)
 - Line --> Discord
     - [x] Message
     - [x] Image
-    - [ ] File
-    - [ ] Video
-    - [ ] Voice...
+    - [x] Video
+    - [ ] Voice(WIP)
+    - [ ] File(Unpossible)
 - Discord --> Line
     - [x] Message
     - [x] Image
-    - [ ] File
-    - [ ] Video
+    - [x] File(Send file url)
+    - [x] Video
     - [ ] Voice...
 
 

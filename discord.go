@@ -47,13 +47,8 @@ func DiscordSendFile(Author, channelID, filename string, file io.Reader) error {
 	}
 
 	sm := fmt.Sprintf("%s:", profile.DisplayName)
-	_, err = DiscordBot.ChannelMessageSend(channelID, sm)
-	if err != nil {
-		Error("Send message to discord", err)
-	}
-	ToDiscord(Author, channelID, "message")
-
-	_, err = DiscordBot.ChannelFileSend(channelID, filename, file)
+	// TODO: Change to ChannelMessageSendComplex
+	_, err = DiscordBot.ChannelFileSendWithMessage(channelID, sm, filename, file)
 	if err != nil {
 		Error("Send file to discord", err)
 		return err

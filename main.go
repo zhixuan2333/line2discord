@@ -33,6 +33,8 @@ var (
 	ParentID          string
 )
 
+const preview = "?width=486&height=487"
+
 func init() {
 	err := godotenv.Load()
 	if err != nil {
@@ -46,7 +48,7 @@ func init() {
 	DiscordToken = os.Getenv("DISCORD_TOKEN")
 
 	PORT = ":" + os.Getenv("PORT")
-	if PORT == "" {
+	if PORT == ":" {
 		PORT = ":8080"
 	}
 
@@ -55,7 +57,7 @@ func init() {
 		LinechannelSecret == "" ||
 		LinechannelToken == "" ||
 		DiscordToken == "" {
-		Error("Not found env. \nex (GuildID, ParentID, LinechannelSecret, LinechannelToken, DiscordToken ", nil)
+		Error("Not found env. \n(ex. GuildID, ParentID, LinechannelSecret, LinechannelToken, DiscordToken\n", nil)
 		os.Exit(1)
 	}
 
@@ -142,20 +144,43 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Attachments != nil {
 		for _, v := range m.Attachments {
 			if v.Width != 0 && v.Height != 0 {
-				_, err := LineBot.PushMessage(lid, linebot.NewImageMessage(v.URL, v.URL)).Do()
-				if err != nil {
-					Error("Send line Image", err)
+				ct := strings.Split(v.URL, ".")
+
+				switch ct[len(ct)-1] {
+				case "jpg", "jpeg", "png", "gif":
+					_, err := LineBot.PushMessage(lid, linebot.NewImageMessage(v.URL, v.URL+preview)).Do()
+					if err != nil {
+						Error("Send line Image", err)
+					}
+					ToLine(lid, m.ChannelID, "image")
+
+				case "mp4", "webm", "mkv", "flv", "avi", "mov", "wmv", "mpg", "mpeg":
+					_, err := LineBot.PushMessage(lid, linebot.NewVideoMessage(v.URL, v.URL+preview)).Do()
+					if err != nil {
+						Error("Send line video", err)
+					}
+					ToLine(lid, m.ChannelID, "video")
+
+				// if is not image or video then send url
+				default:
+					_, err := LineBot.PushMessage(lid, linebot.NewTextMessage(v.URL)).Do()
+					if err != nil {
+						Error("Send line file", err)
+					}
+					ToLine(lid, m.ChannelID, "file")
 				}
-				ToLine(lid, m.ChannelID, "image")
+
 			}
 		}
 	}
+	if m.Content != "" {
+		_, err = LineBot.PushMessage(lid, linebot.NewTextMessage(m.Content)).Do()
+		if err != nil {
+			Error("Send line message", err)
+		}
+		ToLine(lid, m.ChannelID, "message")
 
-	_, err = LineBot.PushMessage(lid, linebot.NewTextMessage(m.Content)).Do()
-	if err != nil {
-		Error("Send line message", err)
 	}
-	ToLine(lid, m.ChannelID, "message")
 
 }
 
@@ -178,24 +203,69 @@ func WebHook(w http.ResponseWriter, req *http.Request) {
 
 			switch message := event.Message.(type) {
 
+			// Text message
 			case *linebot.TextMessage:
 				id := getDiscordID(event)
+
 				DiscordSendMessage(event.Source.UserID, id, message.Text)
 
+			// Image message
 			case *linebot.ImageMessage:
 				id := getDiscordID(event)
 
 				cw, err := LineBot.GetMessageContent(message.ID).Do()
 				if err != nil {
 					Error("Get line file content", err)
-
 				}
 
+				// TODO: Auto get file extension
 				ct := make([]string, 2)
 				ct = strings.Split(cw.ContentType, "/")
 
 				DiscordSendFile(event.Source.UserID, id, message.ID+"."+ct[1], cw.Content)
 
+			// Video message
+			case *linebot.VideoMessage:
+				id := getDiscordID(event)
+
+				cw, err := LineBot.GetMessageContent(message.ID).Do()
+				if err != nil {
+					Error("Get line file content", err)
+				}
+
+				// TODO: Auto get file extension
+				ct := make([]string, 2)
+				ct = strings.Split(cw.ContentType, "/")
+
+				DiscordSendFile(event.Source.UserID, id, message.ID+"."+ct[1], cw.Content)
+
+			// Audio message
+			case *linebot.AudioMessage:
+				// TODO: AudioMessage
+
+				id := getDiscordID(event)
+
+				cw, err := LineBot.GetMessageContent(message.ID).Do()
+				if err != nil {
+					Error("Get line file content", err)
+				}
+
+				// TODO: Auto get file extension
+				ct := make([]string, 2)
+				ct = strings.Split(cw.ContentType, "/")
+
+				DiscordSendFile(event.Source.UserID, id, message.ID+"."+ct[1], cw.Content)
+
+			// File message is not supported
+			case *linebot.FileMessage:
+				id := getDiscordID(event)
+
+				cw, err := LineBot.GetMessageContent(message.ID).Do()
+				if err != nil {
+					Error("Get line file content", err)
+				}
+
+				DiscordSendFile(event.Source.UserID, id, message.ID+cw.ContentType, cw.Content)
 			}
 
 		}
