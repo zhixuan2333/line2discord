@@ -11,8 +11,9 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
-	"github.com/line/line-bot-sdk-go/linebot"
-	"github.com/zhixuan2333/line2discord/db"
+	"github.com/line/line-bot-sdk-go/v7/linebot"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 //go:generate go run github.com/prisma/prisma-client-go generate
@@ -21,8 +22,8 @@ var (
 	LineBot    *linebot.Client
 	DiscordBot *discordgo.Session
 	ctx        context.Context
-	client     *db.PrismaClient
 	PORT       string
+	db         *gorm.DB
 )
 
 var (
@@ -64,22 +65,18 @@ func init() {
 }
 
 func main() {
+	var err error
 
 	// Init Database
 	ctx = context.Background()
-	client = db.NewClient()
-	if err := client.Prisma.Connect(); err != nil {
-		panic(err)
+	db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	if err != nil {
+		Error("Init Database", err)
+		os.Exit(1)
 	}
-	defer func() {
-		if err := client.Prisma.Disconnect(); err != nil {
-			panic(err)
-		}
-	}()
-	Success("Database connected")
+	db.AutoMigrate(&Channel{})
 
 	// Init Line bot
-	var err error
 	LineBot, err = linebot.New(LinechannelSecret, LinechannelToken)
 	if err != nil {
 		panic(err)
@@ -136,11 +133,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	lid := getLineID(m.ChannelID)
-	if lid == "" {
+	var c Channel
+	c.ByDiscordID(m.ChannelID)
+	if c.LineID == "" {
 		return
 	}
-
 	if m.Attachments != nil {
 		for _, v := range m.Attachments {
 			if v.Width != 0 && v.Height != 0 {
@@ -148,37 +145,37 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 				switch ct[len(ct)-1] {
 				case "jpg", "jpeg", "png", "gif":
-					_, err := LineBot.PushMessage(lid, linebot.NewImageMessage(v.URL, v.URL+preview)).Do()
+					_, err := LineBot.PushMessage(c.LineID, linebot.NewImageMessage(v.URL, v.URL+preview)).Do()
 					if err != nil {
 						Error("Send line Image", err)
 					}
-					ToLine(lid, m.ChannelID, "image")
+					ToLine(c.LineID, c.DiscordID, "image")
 
 				case "mp4", "webm", "mkv", "flv", "avi", "mov", "wmv", "mpg", "mpeg":
-					_, err := LineBot.PushMessage(lid, linebot.NewVideoMessage(v.URL, v.URL+preview)).Do()
+					_, err := LineBot.PushMessage(c.LineID, linebot.NewVideoMessage(v.URL, v.URL+preview)).Do()
 					if err != nil {
 						Error("Send line video", err)
 					}
-					ToLine(lid, m.ChannelID, "video")
+					ToLine(c.LineID, c.DiscordID, "video")
 
 				// if is not image or video then send url
 				default:
-					_, err := LineBot.PushMessage(lid, linebot.NewTextMessage(v.URL)).Do()
+					_, err := LineBot.PushMessage(c.LineID, linebot.NewTextMessage(v.URL)).Do()
 					if err != nil {
 						Error("Send line file", err)
 					}
-					ToLine(lid, m.ChannelID, "file")
+					ToLine(c.LineID, c.DiscordID, "file")
 				}
 
 			}
 		}
 	}
 	if m.Content != "" {
-		_, err = LineBot.PushMessage(lid, linebot.NewTextMessage(m.Content)).Do()
+		_, err = LineBot.PushMessage(c.LineID, linebot.NewTextMessage(m.Content)).Do()
 		if err != nil {
 			Error("Send line message", err)
 		}
-		ToLine(lid, m.ChannelID, "message")
+		ToLine(c.LineID, c.DiscordID, "message")
 
 	}
 

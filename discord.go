@@ -3,25 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
-
-	"github.com/bwmarrin/discordgo"
 )
-
-func DiscordcreateChannel(channelName string) (string, error) {
-	channel, err := DiscordBot.GuildChannelCreateComplex(GuildID, discordgo.GuildChannelCreateData{
-		Name:     channelName,
-		Type:     discordgo.ChannelTypeGuildText,
-		ParentID: ParentID,
-	})
-	if err != nil {
-		Error("create discord channel", err)
-
-		return "", err
-	}
-
-	return channel.ID, nil
-
-}
 
 func DiscordSendMessage(Author, channelID, message string) error {
 	profile, err := LineBot.GetProfile(Author).Do()

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/line/line-bot-sdk-go/linebot"
+	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
 
 func getDiscordID(event *linebot.Event) string {
@@ -31,20 +31,14 @@ func getDiscordID(event *linebot.Event) string {
 
 	}
 
-	channel, _ := getRecordByLineID(lid)
-	if channel == nil {
-		id, _ := DiscordcreateChannel(title)
-		channel, _ = createChannel(lid, id, title)
+	c := Channel{
+		LineID: lid,
+		Title:  title,
+	}
+	c.ByLineID()
+	if c.Title != title {
+		c.update(title)
 	}
 
-	if channel.Title != title {
-		channel, _ = updateChannel(lid, title)
-	}
-	return channel.DiscordID
-}
-
-func getLineID(DiscordID string) string {
-	channel, _ := getRecordByDiscordID(DiscordID)
-	return channel.LineID
-
+	return c.DiscordID
 }
