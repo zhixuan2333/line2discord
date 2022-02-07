@@ -31,6 +31,7 @@ require (
 	github.com/jinzhu/now v1.1.4 // indirect
 	github.com/line/line-bot-sdk-go/v7 v7.12.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.10 // indirect
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	golang.org/x/crypto v0.0.0-20220131195533-30dcbda58838 // indirect
 	golang.org/x/sys v0.0.0-20220204135822-1c1b9b1eba6a // indirect
 	golang.org/x/text v0.3.7 // indirect

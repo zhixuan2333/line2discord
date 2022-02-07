@@ -2,10 +2,10 @@ package main
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -19,15 +19,12 @@ type Channel struct {
 
 func (c *Channel) ByLineID() {
 	result := db.Where(&Channel{LineID: c.LineID}).First(&c)
-	fmt.Println(c)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		c.createChannel()
-		fmt.Println(c)
 
 		return
 	} else if result.Error != nil {
-		Error("get channel by line id", result.Error)
-		fmt.Println(c)
+		log.Error("get channel by line id", result.Error)
 
 		return
 	}
@@ -48,7 +45,7 @@ func (c *Channel) createChannel() {
 		ParentID: ParentID,
 	})
 	if err != nil {
-		Error("create discord channel", err)
+		log.Error("create discord channel", err)
 		return
 	}
 

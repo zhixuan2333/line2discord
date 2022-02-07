@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/line/line-bot-sdk-go/v7/linebot"
+	log "github.com/sirupsen/logrus"
 )
 
 func getDiscordID(event *linebot.Event) string {
@@ -13,7 +14,7 @@ func getDiscordID(event *linebot.Event) string {
 		lid = event.Source.UserID
 		profile, err := LineBot.GetProfile(lid).Do()
 		if err != nil {
-			Error("Get line profile", err)
+			log.Error("Get line profile", err)
 		}
 		title = "User | " + profile.DisplayName
 
@@ -21,7 +22,7 @@ func getDiscordID(event *linebot.Event) string {
 		lid = event.Source.GroupID
 		profile, err := LineBot.GetGroupSummary(lid).Do()
 		if err != nil {
-			Error("Get Group Summary", err)
+			log.Error("Get Group Summary", err)
 		}
 		title = "Group | " + profile.GroupName
 
