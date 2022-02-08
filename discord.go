@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/gabriel-vasile/mimetype"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -23,16 +24,18 @@ func DiscordSendMessage(Author, channelID, message string) error {
 	return nil
 }
 
-func DiscordSendFile(Author, channelID, filename string, file io.Reader) error {
+func DiscordSendFile(Author, messageID, channelID, ct string, cw io.ReadCloser) error {
 	profile, err := LineBot.GetProfile(Author).Do()
 	if err != nil {
 		log.Error("Get line profile", err)
 		return err
 	}
-
 	sm := fmt.Sprintf("%s:", profile.DisplayName)
+	ext := mimetype.Lookup(ct)
+	log.Info(ext.Extension())
+
 	// TODO: Change to ChannelMessageSendComplex
-	_, err = DiscordBot.ChannelFileSendWithMessage(channelID, sm, filename, file)
+	_, err = DiscordBot.ChannelFileSendWithMessage(channelID, sm, messageID+ext.Extension(), cw)
 	if err != nil {
 		log.Error("Send file to discord", err)
 		return err
@@ -43,5 +46,5 @@ func DiscordSendFile(Author, channelID, filename string, file io.Reader) error {
 }
 
 func ToDiscord(lid, id, types string) {
-	log.Infof("[MESSAGE] | %33s | --> | %18s | %7s |", lid, id, types)
+	log.Infof("Send meesage to discord from: %v to: %v type: %v", lid, id, types)
 }

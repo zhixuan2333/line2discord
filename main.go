@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"net/http"
 	"os"
 	"os/signal"
@@ -16,13 +15,9 @@ import (
 	"gorm.io/gorm"
 )
 
-//go:generate go run github.com/prisma/prisma-client-go generate
-
 var (
 	LineBot    *linebot.Client
 	DiscordBot *discordgo.Session
-	ctx        context.Context
-	PORT       string
 	db         *gorm.DB
 )
 
@@ -38,9 +33,6 @@ const preview = "?width=486&height=487"
 
 func init() {
 	log.SetLevel(log.InfoLevel)
-	log.SetFormatter(&log.TextFormatter{
-		FullTimestamp: false,
-	})
 	err := godotenv.Load()
 	if err != nil {
 		log.Warn("Not found .env file passed", err)
@@ -51,11 +43,6 @@ func init() {
 	LinechannelSecret = os.Getenv("LINE_CHANNEL_SECRET")
 	LinechannelToken = os.Getenv("LINE_CHANNEL_TOKEN")
 	DiscordToken = os.Getenv("DISCORD_TOKEN")
-
-	PORT = ":" + os.Getenv("PORT")
-	if PORT == ":" {
-		PORT = ":8080"
-	}
 
 	if GuildID == "" ||
 		ParentID == "" ||
@@ -71,19 +58,19 @@ func main() {
 	var err error
 
 	// Init Database
-	ctx = context.Background()
 	db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	if err != nil {
 		log.Panic("Init Database", err)
 	}
 	db.AutoMigrate(&Channel{})
+	log.Info("Successfully connencted to database")
 
 	// Init Line bot
 	LineBot, err = linebot.New(LinechannelSecret, LinechannelToken)
 	if err != nil {
 		panic(err)
 	}
-	log.Info("Line bot Online")
+	log.Info("Successfully online line bot")
 
 	// Init Discord bot
 	DiscordBot, err = discordgo.New("Bot " + DiscordToken)
@@ -92,8 +79,12 @@ func main() {
 	}
 	DiscordBot.AddHandler(messageCreate)
 	DiscordBot.Open()
-	log.Info("Discord bot Online")
+	log.Info("Successfully online discord bot")
 
+	PORT := ":" + os.Getenv("PORT")
+	if PORT == ":" {
+		PORT = ":8080"
+	}
 	// Init Web server
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello, world!"))
@@ -184,94 +175,5 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func ToLine(lid, id, types string) {
-	log.Infof("[MESSAGE] | %33s | <-- | %18s | %7s |", lid, id, types)
-}
-
-// WebHook
-func WebHook(w http.ResponseWriter, req *http.Request) {
-	events, err := LineBot.ParseRequest(req)
-	if err != nil {
-		if err == linebot.ErrInvalidSignature {
-			w.WriteHeader(400)
-		} else {
-			w.WriteHeader(500)
-		}
-		return
-	}
-
-	for _, event := range events {
-
-		switch event.Type {
-		case linebot.EventTypeMessage:
-
-			switch message := event.Message.(type) {
-
-			// Text message
-			case *linebot.TextMessage:
-				id := getDiscordID(event)
-
-				DiscordSendMessage(event.Source.UserID, id, message.Text)
-
-			// Image message
-			case *linebot.ImageMessage:
-				id := getDiscordID(event)
-
-				cw, err := LineBot.GetMessageContent(message.ID).Do()
-				if err != nil {
-					log.Error("Get line file content", err)
-				}
-
-				// TODO: Auto get file extension
-				ct := make([]string, 2)
-				ct = strings.Split(cw.ContentType, "/")
-
-				DiscordSendFile(event.Source.UserID, id, message.ID+"."+ct[1], cw.Content)
-
-			// Video message
-			case *linebot.VideoMessage:
-				id := getDiscordID(event)
-
-				cw, err := LineBot.GetMessageContent(message.ID).Do()
-				if err != nil {
-					log.Error("Get line file content", err)
-				}
-
-				// TODO: Auto get file extension
-				ct := make([]string, 2)
-				ct = strings.Split(cw.ContentType, "/")
-
-				DiscordSendFile(event.Source.UserID, id, message.ID+"."+ct[1], cw.Content)
-
-			// Audio message
-			case *linebot.AudioMessage:
-				// TODO: AudioMessage
-
-				id := getDiscordID(event)
-
-				cw, err := LineBot.GetMessageContent(message.ID).Do()
-				if err != nil {
-					log.Error("Get line file content", err)
-				}
-
-				// TODO: Auto get file extension
-				ct := make([]string, 2)
-				ct = strings.Split(cw.ContentType, "/")
-
-				DiscordSendFile(event.Source.UserID, id, message.ID+"."+ct[1], cw.Content)
-
-			// File message is not supported
-			case *linebot.FileMessage:
-				id := getDiscordID(event)
-
-				cw, err := LineBot.GetMessageContent(message.ID).Do()
-				if err != nil {
-					log.Error("Get line file content", err)
-				}
-
-				DiscordSendFile(event.Source.UserID, id, message.ID+cw.ContentType, cw.Content)
-			}
-
-		}
-
-	}
+	log.Infof("Send meesage to line from: %v to: %v type: %v", lid, id, types)
 }
