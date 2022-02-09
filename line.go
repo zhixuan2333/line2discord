@@ -1,10 +1,59 @@
 package main
 
 import (
-	"github.com/line/line-bot-sdk-go/linebot"
+	"net/http"
+
+	"github.com/line/line-bot-sdk-go/v7/linebot"
+	log "github.com/sirupsen/logrus"
 )
 
-func getDiscordID(event *linebot.Event) string {
+// WebHook
+func WebHook(w http.ResponseWriter, req *http.Request) {
+	events, err := LineBot.ParseRequest(req)
+	if err != nil {
+		if err == linebot.ErrInvalidSignature {
+			w.WriteHeader(400)
+		} else {
+			w.WriteHeader(500)
+		}
+		return
+	}
+
+	for _, event := range events {
+		c := getDiscordID(event)
+
+		switch event.Type {
+		case linebot.EventTypeMessage:
+
+			switch message := event.Message.(type) {
+
+			// Text message
+			case *linebot.TextMessage:
+				c.DiscordSendMessage(event.Source.UserID, message.Text)
+
+			// Image message
+			case *linebot.ImageMessage:
+				c.DiscordSendFile(event.Source.UserID, message.ID)
+
+			// Video message
+			case *linebot.VideoMessage:
+				c.DiscordSendFile(event.Source.UserID, message.ID)
+
+			// Audio message (not work)
+			case *linebot.AudioMessage:
+				c.DiscordSendFile(event.Source.UserID, message.ID)
+
+			// File message is not supported
+			case *linebot.FileMessage:
+				c.DiscordSendFile(event.Source.UserID, message.ID)
+			}
+
+		}
+
+	}
+}
+
+func getDiscordID(event *linebot.Event) Channel {
 	var lid string
 	var title string
 
@@ -13,7 +62,7 @@ func getDiscordID(event *linebot.Event) string {
 		lid = event.Source.UserID
 		profile, err := LineBot.GetProfile(lid).Do()
 		if err != nil {
-			Error("Get line profile", err)
+			log.Error("Get line profile", err)
 		}
 		title = "User | " + profile.DisplayName
 
@@ -21,7 +70,7 @@ func getDiscordID(event *linebot.Event) string {
 		lid = event.Source.GroupID
 		profile, err := LineBot.GetGroupSummary(lid).Do()
 		if err != nil {
-			Error("Get Group Summary", err)
+			log.Error("Get Group Summary", err)
 		}
 		title = "Group | " + profile.GroupName
 
@@ -31,20 +80,13 @@ func getDiscordID(event *linebot.Event) string {
 
 	}
 
-	channel, _ := getRecordByLineID(lid)
-	if channel == nil {
-		id, _ := DiscordcreateChannel(title)
-		channel, _ = createChannel(lid, id, title)
+	c := Channel{
+		LineID: lid,
+		Title:  title,
 	}
-
-	if channel.Title != title {
-		channel, _ = updateChannel(lid, title)
+	c.ByLineID()
+	if c.Title != title {
+		c.update(title)
 	}
-	return channel.DiscordID
-}
-
-func getLineID(DiscordID string) string {
-	channel, _ := getRecordByDiscordID(DiscordID)
-	return channel.LineID
-
+	return c
 }

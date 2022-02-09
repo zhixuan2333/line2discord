@@ -22,15 +22,15 @@ LINE_CHANNEL_TOKEN=
 DISCORD_TOKEN=
 ```
 
-### What is GUILD_ID?
+### What is `GUILD_ID`?
 
 The ID is your server id that you want to connect to.
 
-### What is PARENT_ID?
+### What is `PARENT_ID`?
 
 The ID is your category id that you want to connect to.
 
-### How to get LINE_CHANNEL_SECRET and LINE_CHANNEL_TOKEN?
+### How to get `LINE_CHANNEL_SECRET` and `LINE_CHANNEL_TOKEN`?
 
 1. Go to https://developers.line.biz/
 2. Click to "Console"
@@ -45,7 +45,7 @@ The ID is your category id that you want to connect to.
 11. Disable "Auto-reply messages" and "Greeting messages"
     Enable "Allow bot to join group chats"
 
-### How to get DISCORD_TOKEN?
+### How to get `DISCORD_TOKEN`?
 
 1. Go to https://discord.com/developers/applications
 2. Click to "New Application"

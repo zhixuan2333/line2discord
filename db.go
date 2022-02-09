@@ -3,66 +3,52 @@ package main
 import (
 	"errors"
 
-	"github.com/zhixuan2333/line2discord/db"
+	"github.com/bwmarrin/discordgo"
+	"github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
-func getRecordByLineID(lineID string) (*db.ChannelModel, error) {
-
-	channel, err := client.Channel.FindUnique(
-		db.Channel.LineID.Equals(lineID),
-	).Exec(ctx)
-	if errors.Is(err, db.ErrNotFound) {
-		return nil, nil
-	} else if err != nil {
-		Error("Get Record by lineID", err)
-		return channel, err
-	}
-
-	return channel, nil
-
+type Channel struct {
+	gorm.Model
+	ID        uuid.UUID `gorm:"type:uuid;not null;primary_key"`
+	Title     string
+	LineID    string `gorm:"type:varchar(100);not null"`
+	DiscordID string `gorm:"type:varchar(100);not null"`
 }
 
-func getRecordByDiscordID(DiscordID string) (*db.ChannelModel, error) {
-
-	channel, err := client.Channel.FindUnique(
-		db.Channel.DiscordID.Equals(DiscordID),
-	).Exec(ctx)
-	if errors.Is(err, db.ErrNotFound) {
-		return nil, nil
-	} else if err != nil {
-		Error("Get Record by DiscordID", err)
-
-		return channel, err
+func (c *Channel) ByLineID() {
+	result := db.Where(&Channel{LineID: c.LineID}).First(&c)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		c.createChannel()
+		return
+	} else if result.Error != nil {
+		log.Error("get channel by line id", result.Error)
+		return
 	}
-
-	return channel, nil
-
 }
 
-func updateChannel(lineID, title string) (*db.ChannelModel, error) {
-	channel, err := client.Channel.FindUnique(
-		db.Channel.LineID.Equals(lineID),
-	).Update(
-		db.Channel.Title.Set(title),
-	).Exec(ctx)
+func (c *Channel) ByDiscordID(DiscordID string) {
+	db.Where(&Channel{DiscordID: DiscordID}).First(&c)
+}
+
+func (c *Channel) update(title string) {
+	db.Model(&c).Update("title", title)
+}
+
+func (c *Channel) createChannel() {
+	channel, err := DiscordBot.GuildChannelCreateComplex(GuildID, discordgo.GuildChannelCreateData{
+		Name:     c.Title,
+		Type:     discordgo.ChannelTypeGuildText,
+		ParentID: ParentID,
+	})
 	if err != nil {
-		Error("Update record title", err)
-
+		log.Error("create discord channel", err)
+		return
 	}
 
-	return channel, err
-}
+	c.ID = uuid.New()
+	c.DiscordID = channel.ID
 
-func createChannel(lineID, discordID, Title string) (*db.ChannelModel, error) {
-
-	channel, err := client.Channel.CreateOne(
-		db.Channel.Title.Set(Title),
-		db.Channel.LineID.Set(lineID),
-		db.Channel.DiscordID.Set(discordID),
-	).Exec(ctx)
-	if err != nil {
-		Error("Create Record", err)
-		return nil, err
-	}
-	return channel, nil
+	db.Create(c)
 }
