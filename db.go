@@ -21,11 +21,9 @@ func (c *Channel) ByLineID() {
 	result := db.Where(&Channel{LineID: c.LineID}).First(&c)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		c.createChannel()
-
 		return
 	} else if result.Error != nil {
 		log.Error("get channel by line id", result.Error)
-
 		return
 	}
 }

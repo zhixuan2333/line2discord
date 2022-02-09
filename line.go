@@ -20,7 +20,7 @@ func WebHook(w http.ResponseWriter, req *http.Request) {
 	}
 
 	for _, event := range events {
-		id := getDiscordID(event)
+		c := getDiscordID(event)
 
 		switch event.Type {
 		case linebot.EventTypeMessage:
@@ -29,56 +29,23 @@ func WebHook(w http.ResponseWriter, req *http.Request) {
 
 			// Text message
 			case *linebot.TextMessage:
-
-				DiscordSendMessage(event.Source.UserID, id, message.Text)
+				c.DiscordSendMessage(event.Source.UserID, message.Text)
 
 			// Image message
 			case *linebot.ImageMessage:
-
-				cw, err := LineBot.GetMessageContent(message.ID).Do()
-				if err != nil {
-					log.Error("Get line file content", err)
-					return
-				}
-
-				log.Info(cw.ContentType)
-
-				defer cw.Content.Close()
-
-				DiscordSendFile(event.Source.UserID, message.ID, id, cw.ContentType, cw.Content)
+				c.DiscordSendFile(event.Source.UserID, message.ID)
 
 			// Video message
 			case *linebot.VideoMessage:
+				c.DiscordSendFile(event.Source.UserID, message.ID)
 
-				cw, err := LineBot.GetMessageContent(message.ID).Do()
-				if err != nil {
-					log.Error("Get line file content", err)
-					return
-				}
-				DiscordSendFile(event.Source.UserID, message.ID, id, cw.ContentType, cw.Content)
-
-			// Audio message
+			// Audio message (not work)
 			case *linebot.AudioMessage:
-				// TODO: AudioMessage
-
-				cw, err := LineBot.GetMessageContent(message.ID).Do()
-				if err != nil {
-					log.Error("Get line file content", err)
-					return
-				}
-
-				DiscordSendFile(event.Source.UserID, message.ID, id, cw.ContentType, cw.Content)
+				c.DiscordSendFile(event.Source.UserID, message.ID)
 
 			// File message is not supported
 			case *linebot.FileMessage:
-
-				cw, err := LineBot.GetMessageContent(message.ID).Do()
-				if err != nil {
-					log.Error("Get line file content", err)
-					return
-				}
-
-				DiscordSendFile(event.Source.UserID, message.ID, id, cw.ContentType, cw.Content)
+				c.DiscordSendFile(event.Source.UserID, message.ID)
 			}
 
 		}
@@ -86,7 +53,7 @@ func WebHook(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func getDiscordID(event *linebot.Event) string {
+func getDiscordID(event *linebot.Event) Channel {
 	var lid string
 	var title string
 
@@ -121,6 +88,5 @@ func getDiscordID(event *linebot.Event) string {
 	if c.Title != title {
 		c.update(title)
 	}
-
-	return c.DiscordID
+	return c
 }

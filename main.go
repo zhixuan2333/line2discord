@@ -11,7 +11,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 	log "github.com/sirupsen/logrus"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -27,6 +27,7 @@ var (
 	DiscordToken      string
 	GuildID           string
 	ParentID          string
+	DatabaseURL       string
 )
 
 const preview = "?width=486&height=487"
@@ -43,12 +44,14 @@ func init() {
 	LinechannelSecret = os.Getenv("LINE_CHANNEL_SECRET")
 	LinechannelToken = os.Getenv("LINE_CHANNEL_TOKEN")
 	DiscordToken = os.Getenv("DISCORD_TOKEN")
+	DatabaseURL = os.Getenv("DATABASE_URL")
 
 	if GuildID == "" ||
 		ParentID == "" ||
 		LinechannelSecret == "" ||
 		LinechannelToken == "" ||
-		DiscordToken == "" {
+		DiscordToken == "" ||
+		DatabaseURL == "" {
 		log.Panicf("Not found env. \n(ex. GuildID, ParentID, LinechannelSecret, LinechannelToken, DiscordToken\n", nil)
 	}
 
@@ -58,7 +61,9 @@ func main() {
 	var err error
 
 	// Init Database
-	db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	// db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	db, err = gorm.Open(postgres.Open(DatabaseURL), &gorm.Config{})
+
 	if err != nil {
 		log.Panic("Init Database", err)
 	}
