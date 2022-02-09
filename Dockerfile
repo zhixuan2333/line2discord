@@ -2,6 +2,7 @@ FROM golang:1.17 as build
 
 WORKDIR /app
 
+COPY . ./
 # build the binary with all dependencies
 RUN go build -o /main .
 
