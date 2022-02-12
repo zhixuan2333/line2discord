@@ -13,3 +13,5 @@
 
 bin
 .env
+
+test.db

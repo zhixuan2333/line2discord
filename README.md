@@ -1,12 +1,31 @@
-# Line2Discord (_L2D_)
+[![Issues](https://img.shields.io/github/issues/zhixuan2333/line2discord?style=for-the-badge)](https://github.com/zhixuan2333/line2discord/issues)
+[![License](https://img.shields.io/github/license/zhixuan2333/line2discord?style=for-the-badge)](./LICENSE)
+[![Twitter](https://img.shields.io/twitter/follow/zhixuan2333?style=for-the-badge)](https://twitter.com/zhixuan2333)
 
-<img src="https://raw.githubusercontent.com/zhixuan2333/line2discord/master/resource/L2D.png" width="100">
+<div align="center">
+  <a href="https://github.com/zhixuan2333/line2discord">
+    <img src="resource/L2D.png" alt="Logo" width="80" height="80">
+  </a>
+
+  <h3 align="center">line2discord</h3>
+
+  <p align="center">
+    A bot to connects LINE to Discord.
+    <br />
+    <a href="https://github.com/zhixuan2333/line2discord/blob/master/docs/quickstart.md"><strong>Explore the docs »</strong></a>
+    <!-- <br />
+    <br />
+    <a href="https://github.com/zhixuan2333/line2discord/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/zhixuan2333/line2discord/issues">Request Feature</a> -->
+  </p>
+</div>
 
 ## Preview
 
 ![Preview](./resource/l2d_video.gif)
 
-## How to use
+## Getting Started
 
 See [quickstart.md](./docs/quickstart.md)
 
@@ -26,6 +45,14 @@ See [quickstart.md](./docs/quickstart.md)
     -   [ ] Voice...
 
 ## Contributing
+
+```sh
+git clone https://github.com/zhixuan2333/line2discord.git
+cd line2discord
+cp .env.example .env
+# edit .env
+go run .
+```
 
 ### Writing Commit Messages
 
