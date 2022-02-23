@@ -6,6 +6,7 @@
 -   A server
 -   A line bot
 -   A discord bot
+-   A container
 
 ## Install
 
@@ -21,7 +22,7 @@ cp .env.example .env
 
 You will get this.
 
-```toml
+```ini
 DATABASE_URL=postgresql://postgres:postgres@example.com:5998/dbname
 GUILD_ID=
 PARENT_ID=
@@ -61,7 +62,15 @@ DISCORD_TOKEN=
 ```
 ./line2discord
 ```
+
 <!-- 
 ## Hosting
 
-if you what use L2D whitout yout own container or database. Please see [here](./starter/railway.md) -->
+
+1. Go to https://discord.com/developers/applications
+2. Click to "New Application"
+3. Type bot name. And Create it
+4. Go to Bot and add Bot
+5. Click to Reveal Token
+6. Visit it to add to your server
+   [https://discord.com/oauth2/authorize?client_id={{CLIENT_ID}}&permissions=8&scope=bot](https://discord.com/oauth2/authorize?client_id={{CLIENT_ID}}&permissions=8&scope=bot)
