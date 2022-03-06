@@ -13,11 +13,11 @@
     A bot to connects LINE to Discord.
     <br />
     <a href="https://github.com/zhixuan2333/line2discord/blob/master/docs/quickstart.md"><strong>Explore the docs »</strong></a>
-    <!-- <br />
     <br />
-    <a href="https://github.com/zhixuan2333/line2discord/issues">Report Bug</a>
+    <br />
+    <a href="https://github.com/zhixuan2333/line2discord/blob/master/docs/quickstart.md">English</a>
     ·
-    <a href="https://github.com/zhixuan2333/line2discord/issues">Request Feature</a> -->
+    <a href="https://github.com/zhixuan2333/line2discord/blob/master/docs/quickstart.ja.md">日本語</a>
   </p>
 </div>
 

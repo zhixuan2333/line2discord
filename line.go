@@ -47,7 +47,6 @@ func WebHook(w http.ResponseWriter, req *http.Request) {
 			case *linebot.FileMessage:
 				c.DiscordSendFile(event.Source.UserID, message.ID)
 			}
-
 		}
 
 	}
