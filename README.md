@@ -24,6 +24,7 @@
 ## Preview
 
 ![Preview](./resource/l2d_video.gif)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fzhixuan2333%2Fline2discord.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fzhixuan2333%2Fline2discord?ref=badge_shield)
 
 ## Getting Started
 
@@ -61,6 +62,9 @@ We use [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) (a
 ## License
 
 Licensed under the [MIT License](./LICENSE).
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fzhixuan2333%2Fline2discord.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fzhixuan2333%2Fline2discord?ref=badge_large)
 
 ## Thanks to
 
