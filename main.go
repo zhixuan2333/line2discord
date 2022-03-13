@@ -10,6 +10,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 	log "github.com/sirupsen/logrus"
+	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -59,8 +60,13 @@ func main() {
 	var err error
 
 	// Init Database
-	db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-	// db, err = gorm.Open(postgres.Open(DatabaseURL), &gorm.Config{})
+	if os.Getenv("IS_TEST") == "true" {
+		db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+
+	} else {
+		db, err = gorm.Open(postgres.Open(DatabaseURL), &gorm.Config{})
+
+	}
 
 	if err != nil {
 		log.Panic("Init Database", err)
