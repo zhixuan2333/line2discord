@@ -37,7 +37,7 @@ func (c *Channel) update(title string) {
 }
 
 func (c *Channel) createChannel() {
-	channel, err := DiscordBot.GuildChannelCreateComplex(GuildID, discordgo.GuildChannelCreateData{
+	channel, err := discord.GuildChannelCreateComplex(GuildID, discordgo.GuildChannelCreateData{
 		Name:     c.Title,
 		Type:     discordgo.ChannelTypeGuildText,
 		ParentID: ParentID,

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"strings"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/gabriel-vasile/mimetype"
@@ -16,14 +16,30 @@ func (c *Channel) DiscordSendMessage(Author, message string) error {
 		log.Error("Get line profile", err)
 		return err
 	}
-
-	sm := fmt.Sprintf("%s: %s", profile.DisplayName, message)
-	_, err = DiscordBot.ChannelMessageSend(c.DiscordID, sm)
+	_, err = discord.ChannelMessageSendComplex(c.DiscordID, &discordgo.MessageSend{
+		Embed: &discordgo.MessageEmbed{
+			Color: 0x5A65F1,
+			Author: &discordgo.MessageEmbedAuthor{
+				Name:    profile.DisplayName,
+				IconURL: profile.PictureURL,
+				URL:     "https://example.com/#" + Author,
+			},
+			Description: message,
+			Footer: &discordgo.MessageEmbedFooter{
+				IconURL: discord.State.User.AvatarURL(""),
+				Text:    discord.State.User.Username,
+			},
+			Timestamp: time.Now().Format(time.RFC3339),
+		},
+	})
 	if err != nil {
 		log.Error("Send message to discord", err)
+		return err
 	}
+
 	ToDiscord(Author, c.DiscordID, "message")
 	return nil
+
 }
 
 func (c *Channel) DiscordSendFile(Author, messageID string) error {
@@ -39,18 +55,56 @@ func (c *Channel) DiscordSendFile(Author, messageID string) error {
 		log.Error("Get line profile", err)
 		return err
 	}
-	sm := fmt.Sprintf("%s:", profile.DisplayName)
-	ext := mimetype.Lookup(cw.ContentType)
-	log.Info(ext.Extension())
 
-	// TODO: Change to ChannelMessageSendComplex
-	_, err = DiscordBot.ChannelFileSendWithMessage(c.DiscordID, sm, messageID+ext.Extension(), cw.Content)
+	filetype := strings.Split(cw.ContentType, "/")[0]
+	ext := mimetype.Lookup(cw.ContentType)
+
+	message := &discordgo.MessageSend{
+		Files: []*discordgo.File{
+			{
+				Name:   messageID + ext.Extension(),
+				Reader: cw.Content,
+			},
+		},
+		Embed: &discordgo.MessageEmbed{
+			Color: 0x5A65F1,
+			Author: &discordgo.MessageEmbedAuthor{
+				Name:    profile.DisplayName,
+				IconURL: profile.PictureURL,
+				URL:     "https://example.com/#" + Author,
+			},
+			Footer: &discordgo.MessageEmbedFooter{
+				IconURL: discord.State.User.AvatarURL(""),
+				Text:    discord.State.User.Username,
+			},
+			Timestamp: time.Now().Format(time.RFC3339),
+		},
+	}
+
+	switch filetype {
+	case "image":
+		message.Embed.Image = &discordgo.MessageEmbedImage{
+			URL: "attachment://" + messageID + ext.Extension(),
+		}
+		message.Embed.Description = "Image send from LINE"
+
+	case "video":
+		message.Embed.Video = &discordgo.MessageEmbedVideo{
+			URL: "attachment://" + messageID + ext.Extension(),
+		}
+		message.Embed.Description = "Video send from LINE"
+
+	default:
+		message.Embed.Description = "Some file send from Line."
+	}
+
+	_, err = discord.ChannelMessageSendComplex(c.DiscordID, message)
 	if err != nil {
-		log.Error("Send file to discord", err)
+		log.Errorf("Send message to discord %v\n", err)
 		return err
 	}
-	ToDiscord(Author, c.DiscordID, "file")
 
+	ToDiscord(Author, c.DiscordID, "file")
 	return nil
 }
 
@@ -71,7 +125,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	st, err := DiscordBot.Channel(m.ChannelID)
+	st, err := discord.Channel(m.ChannelID)
 	if err != nil {
 		log.Error("Get Discord info", err)
 		return

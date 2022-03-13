@@ -10,14 +10,14 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 	log "github.com/sirupsen/logrus"
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 var (
-	LineBot    *linebot.Client
-	DiscordBot *discordgo.Session
-	db         *gorm.DB
+	LineBot *linebot.Client
+	discord *discordgo.Session
+	db      *gorm.DB
 )
 
 var (
@@ -38,30 +38,29 @@ func init() {
 		log.Warn("Not found .env file passed", err)
 	}
 
-	GuildID = os.Getenv("GUILD_ID")
-	ParentID = os.Getenv("PARENT_ID")
 	LinechannelSecret = os.Getenv("LINE_CHANNEL_SECRET")
 	LinechannelToken = os.Getenv("LINE_CHANNEL_TOKEN")
 	DiscordToken = os.Getenv("DISCORD_TOKEN")
+	GuildID = os.Getenv("GUILD_ID")
+	ParentID = os.Getenv("PARENT_ID")
 	DatabaseURL = os.Getenv("DATABASE_URL")
 
-	if GuildID == "" ||
-		ParentID == "" ||
-		LinechannelSecret == "" ||
+	if LinechannelSecret == "" ||
 		LinechannelToken == "" ||
 		DiscordToken == "" ||
+		GuildID == "" ||
+		ParentID == "" ||
 		DatabaseURL == "" {
-		log.Panicf("Not found env. \n(ex. GuildID, ParentID, LinechannelSecret, LinechannelToken, DiscordToken\n", nil)
+		log.Panicf("Not found env. \n(ex. LinechannelSecret, LinechannelToken, DiscordToken, GuildID, ParentID, DatabaseURL \n", nil)
 	}
-
 }
 
 func main() {
 	var err error
 
 	// Init Database
-	// db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-	db, err = gorm.Open(postgres.Open(DatabaseURL), &gorm.Config{})
+	db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	// db, err = gorm.Open(postgres.Open(DatabaseURL), &gorm.Config{})
 
 	if err != nil {
 		log.Panic("Init Database", err)
@@ -77,12 +76,12 @@ func main() {
 	log.Info("Successfully online line bot")
 
 	// Init Discord bot
-	DiscordBot, err = discordgo.New("Bot " + DiscordToken)
+	discord, err = discordgo.New("Bot " + DiscordToken)
 	if err != nil {
 		panic(err)
 	}
-	DiscordBot.AddHandler(messageCreate)
-	DiscordBot.Open()
+	discord.AddHandler(messageCreate)
+	discord.Open()
 	log.Info("Successfully online discord bot")
 
 	PORT := ":" + os.Getenv("PORT")
@@ -103,6 +102,6 @@ func main() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, syscall.SIGTERM)
 	<-sc
-	DiscordBot.Close()
+	discord.Close()
 
 }
