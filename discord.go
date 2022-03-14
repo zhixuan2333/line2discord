@@ -138,6 +138,20 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	var c Channel
 	c.ByDiscordID(m.ChannelID)
 	if c.LineID == "" {
+		_, err = discord.ChannelMessageSendComplex(c.DiscordID, &discordgo.MessageSend{
+			Embed: &discordgo.MessageEmbed{
+				Color:       0x5A65F1,
+				Description: "This channel is not connected to LINE.\n",
+				Footer: &discordgo.MessageEmbedFooter{
+					IconURL: discord.State.User.AvatarURL(""),
+					Text:    discord.State.User.Username,
+				},
+				Timestamp: time.Now().Format(time.RFC3339),
+			},
+		})
+		if err != nil {
+			log.Error("Send message to discord", err)
+		}
 		return
 	}
 	if m.Attachments != nil {
