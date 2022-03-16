@@ -65,15 +65,12 @@ DISCORD_TOKEN=
 ./line2discord
 ```
 
-<!-- 
-## Hosting
+## Setting Webhook
 
+When Deploy is completed,
 
-1. Go to https://discord.com/developers/applications
-2. Click to "New Application"
-3. Type bot name. And Create it
-4. Go to Bot and add Bot
-5. Click to Reveal Token
-6. Visit it to add to your server
-   [https://discord.com/oauth2/authorize?client_id={{CLIENT_ID}}&permissions=8&scope=bot](https://discord.com/oauth2/authorize?client_id={{CLIENT_ID}}&permissions=8&scope=bot)
--->
+1. Access to https://railway.app/dashboard and select line2discord
+2. Below line2discord, there will display a domain, please memorize it. (When you access, you will see `Hello, world!`)
+3. Access to https://developers.line.biz/console/ and select the channel you created
+4. In the `Messaging Api Setting`, set the `Webhook URL` to https://yourdomain.com/webhook
+

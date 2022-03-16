@@ -12,3 +12,10 @@ About the environment variables:
 
 See [Configure L2D](../quickstart.md#configure-l2d)
 
+## Setting Webhook
+
+When Deploy is completed,
+1. Access to https://railway.app/dashboard and select line2discord
+2. Below line2discord, there will display a domain, please memorize it. (When you access, you will see `Hello, world!`)
+3. Access to https://developers.line.biz/console/ and select the channel you created
+4. In the `Messaging Api Setting`, set the `Webhook URL` to https://yourdomain.com/webhook

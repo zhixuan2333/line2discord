@@ -65,15 +65,11 @@ DISCORD_TOKEN=
 $ ./line2discord
 ```
 
-<!--
-## Hosting
+## webhook の設定
 
+Deploy が完了したら
 
-1. Go to https://discord.com/developers/applications
-2. Click to "New Application"
-3. Type bot name. And Create it
-4. Go to Bot and add Bot
-5. Click to Reveal Token
-6. Visit it to add to your server
-   [https://discord.com/oauth2/authorize?client_id={{CLIENT_ID}}&permissions=8&scope=bot](https://discord.com/oauth2/authorize?client_id={{CLIENT_ID}}&permissions=8&scope=bot)
--->
+1. https://railway.app/dashboard にアクセスして、line2discord を選択する
+2. line2discord の下に Domain Name があるので、これをメモしておいてください。（実際にアクセスしたら、`Hello, world!`と表示されます。）
+3. https://developers.line.biz/console/ をアクセスして、作成したチャネルを選択する
+4. `Messaging Api Setting`で、`Webhook URL`を設定してください。(https://yourdomain.com/webhook と設定してください)
