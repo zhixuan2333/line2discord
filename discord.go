@@ -2,12 +2,16 @@ package main
 
 import (
 	"strings"
-	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 	log "github.com/sirupsen/logrus"
+)
+
+var (
+	componentsHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){}
+	commandHandlers    = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){}
 )
 
 func (c *Channel) DiscordSendMessage(Author, message string) error {
@@ -25,11 +29,6 @@ func (c *Channel) DiscordSendMessage(Author, message string) error {
 				URL:     "https://example.com/#" + Author,
 			},
 			Description: message,
-			Footer: &discordgo.MessageEmbedFooter{
-				IconURL: discord.State.User.AvatarURL(""),
-				Text:    discord.State.User.Username,
-			},
-			Timestamp: time.Now().Format(time.RFC3339),
 		},
 	})
 	if err != nil {
@@ -73,11 +72,6 @@ func (c *Channel) DiscordSendFile(Author, messageID string) error {
 				IconURL: profile.PictureURL,
 				URL:     "https://example.com/#" + Author,
 			},
-			Footer: &discordgo.MessageEmbedFooter{
-				IconURL: discord.State.User.AvatarURL(""),
-				Text:    discord.State.User.Username,
-			},
-			Timestamp: time.Now().Format(time.RFC3339),
 		},
 	}
 
@@ -86,16 +80,16 @@ func (c *Channel) DiscordSendFile(Author, messageID string) error {
 		message.Embed.Image = &discordgo.MessageEmbedImage{
 			URL: "attachment://" + messageID + ext.Extension(),
 		}
-		message.Embed.Description = "Image send from LINE"
+		message.Embed.Title = "🌟 Image"
 
 	case "video":
 		message.Embed.Video = &discordgo.MessageEmbedVideo{
 			URL: "attachment://" + messageID + ext.Extension(),
 		}
-		message.Embed.Description = "Video send from LINE"
+		message.Embed.Title = "📽️ Video"
 
 	default:
-		message.Embed.Description = "Some file send from Line."
+		message.Embed.Title = "📂 File"
 	}
 
 	_, err = discord.ChannelMessageSendComplex(c.DiscordID, message)
@@ -106,6 +100,34 @@ func (c *Channel) DiscordSendFile(Author, messageID string) error {
 
 	ToDiscord(Author, c.DiscordID, "file")
 	return nil
+}
+
+func (c *Channel) DiscordSendSticker(Author, message string) error {
+	profile, err := LineBot.GetProfile(Author).Do()
+	if err != nil {
+		log.Error("Get line profile", err)
+		return err
+	}
+	_, err = discord.ChannelMessageSendComplex(c.DiscordID, &discordgo.MessageSend{
+		Embed: &discordgo.MessageEmbed{
+			Color: 0x5A65F1,
+			Author: &discordgo.MessageEmbedAuthor{
+				Name:    profile.DisplayName,
+				IconURL: profile.PictureURL,
+				URL:     "https://example.com/#" + Author,
+			},
+			Title:       "🌟 Sticker",
+			Description: "Sticker ID is " + message,
+		},
+	})
+	if err != nil {
+		log.Error("Send message to discord", err)
+		return err
+	}
+
+	ToDiscord(Author, c.DiscordID, "sticker")
+	return nil
+
 }
 
 func ToDiscord(lid, id, types string) {
@@ -138,20 +160,17 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	var c Channel
 	c.ByDiscordID(m.ChannelID)
 	if c.LineID == "" {
-		_, err = discord.ChannelMessageSendComplex(c.DiscordID, &discordgo.MessageSend{
+		m, err := discord.ChannelMessageSendComplex(m.ChannelID, &discordgo.MessageSend{
 			Embed: &discordgo.MessageEmbed{
 				Color:       0x5A65F1,
-				Description: "This channel is not connected to LINE.\n",
-				Footer: &discordgo.MessageEmbedFooter{
-					IconURL: discord.State.User.AvatarURL(""),
-					Text:    discord.State.User.Username,
-				},
-				Timestamp: time.Now().Format(time.RFC3339),
+				Title:       "⚠️ Error",
+				Description: "This channel is not connected to LINE.",
 			},
 		})
 		if err != nil {
-			log.Error("Send message to discord", err)
+			log.Error("Send message to discord ", err)
 		}
+		log.Warnf("This channel is not connected to LINE. channelID: %v\n", m.ChannelID)
 		return
 	}
 	if m.Attachments != nil {
@@ -159,6 +178,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			if v.Width != 0 && v.Height != 0 {
 				ct := strings.Split(v.URL, ".")
 
+				// TODO: Change to use mimetype
 				switch ct[len(ct)-1] {
 				case "jpg", "jpeg", "png", "gif":
 					_, err := LineBot.PushMessage(c.LineID, linebot.NewImageMessage(v.URL, v.URL+preview)).Do()

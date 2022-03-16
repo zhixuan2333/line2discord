@@ -12,9 +12,9 @@ func WebHook(w http.ResponseWriter, req *http.Request) {
 	events, err := LineBot.ParseRequest(req)
 	if err != nil {
 		if err == linebot.ErrInvalidSignature {
-			w.WriteHeader(400)
+			w.WriteHeader(http.StatusBadRequest)
 		} else {
-			w.WriteHeader(500)
+			w.WriteHeader(http.StatusInternalServerError)
 		}
 		return
 	}
@@ -46,6 +46,10 @@ func WebHook(w http.ResponseWriter, req *http.Request) {
 			// File message is not supported
 			case *linebot.FileMessage:
 				c.DiscordSendFile(event.Source.UserID, message.ID)
+
+			case *linebot.StickerMessage:
+				c.DiscordSendSticker(event.Source.UserID, message.PackageID+message.StickerID)
+
 			}
 		}
 
@@ -63,7 +67,7 @@ func getDiscordID(event *linebot.Event) Channel {
 		if err != nil {
 			log.Error("Get line profile", err)
 		}
-		title = "User | " + profile.DisplayName
+		title = "👤・" + profile.DisplayName
 
 	case linebot.EventSourceTypeGroup:
 		lid = event.Source.GroupID
@@ -71,21 +75,24 @@ func getDiscordID(event *linebot.Event) Channel {
 		if err != nil {
 			log.Error("Get Group Summary", err)
 		}
-		title = "Group | " + profile.GroupName
+		title = "👥・" + profile.GroupName
 
 	case linebot.EventSourceTypeRoom:
 		lid = event.Source.RoomID
-		title = "Talk | " + lid
+		title = "🗣️・ " + lid
 
 	}
 
 	c := Channel{
 		LineID: lid,
-		Title:  title,
 	}
 	c.ByLineID()
 	if c.Title != title {
 		c.update(title)
+		_, err := discord.ChannelEdit(c.DiscordID, title)
+		if err != nil {
+			log.Errorf("Can't edit channel name: %v", err)
+		}
 	}
 	return c
 }

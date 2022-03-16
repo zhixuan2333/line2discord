@@ -28,12 +28,14 @@ var (
 	GuildID           string
 	ParentID          string
 	DatabaseURL       string
+	Version           string
 )
 
 const preview = "?width=486&height=487"
 
 func init() {
 	log.SetLevel(log.InfoLevel)
+	log.Infof("line2discord %v", Version)
 	err := godotenv.Load()
 	if err != nil {
 		log.Warn("Not found .env file passed", err)
