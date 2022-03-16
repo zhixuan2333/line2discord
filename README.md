@@ -36,12 +36,14 @@ See [quickstart.md](./docs/quickstart.md)
     -   [x] Image
     -   [x] Video
     -   [ ] Voice(WIP)
+    -   [ ] Sticker(not supported, but send sticker ID)
     -   [ ] File(Unpossible)
 -   Discord --> Line
     -   [x] Message
     -   [x] Image
     -   [x] File(Send file url)
     -   [x] Video
+    -   [ ] Sticker
     -   [ ] Voice...
 
 ## Contributing
