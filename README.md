@@ -56,13 +56,9 @@ cp .env.example .env
 go run .
 ```
 
-### Writing Commit Messages
-
-We use [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) (also known as semantic commits) to ensure consistent and descriptive commit messages.
-
 ## License
 
-Licensed under the [MIT License](./LICENSE).
+Licensed under the [GPL-3.0](./LICENSE).
 
 ## Thanks to
 
