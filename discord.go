@@ -80,7 +80,7 @@ func (c *Channel) DiscordSendFile(Author, messageID string) error {
 		message.Embed.Image = &discordgo.MessageEmbedImage{
 			URL: "attachment://" + messageID + ext.Extension(),
 		}
-		message.Embed.Title = "🌟 Image"
+		message.Embed.Title = "📷 Image"
 
 	case "video":
 		message.Embed.Video = &discordgo.MessageEmbedVideo{
@@ -193,6 +193,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 						log.Error("Send line video", err)
 					}
 					ToLine(c.LineID, c.DiscordID, "video")
+
+				// TODO: Audio length
+				case "m4a":
+					_, err := LineBot.PushMessage(c.LineID, linebot.NewAudioMessage(v.URL, v.Size)).Do()
+					if err != nil {
+						log.Error("Send line audio", err)
+					}
+					ToLine(c.LineID, c.DiscordID, "audio")
 
 				// if is not image or video then send url
 				default:

@@ -31,6 +31,10 @@ See [quickstart.md](./docs/quickstart.md)
 
 ## features
 
+✅ DM
+✅ Group
+⚠️ ChatRoom (Not Test)
+
 -   Line --> Discord
     -   [x] Message
     -   [x] Image
