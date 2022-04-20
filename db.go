@@ -17,7 +17,7 @@ type Channel struct {
 	DiscordID string `gorm:"type:varchar(100);not null"`
 }
 
-func (c *Channel) ByLineID() {
+func (c *Channel) byLineID() {
 	result := db.Where(&Channel{LineID: c.LineID}).First(&c)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		c.createChannel()
@@ -28,8 +28,8 @@ func (c *Channel) ByLineID() {
 	}
 }
 
-func (c *Channel) ByDiscordID(DiscordID string) {
-	db.Where(&Channel{DiscordID: DiscordID}).First(&c)
+func (c *Channel) byDiscordID() {
+	db.Where(&Channel{DiscordID: c.DiscordID}).First(&c)
 }
 
 func (c *Channel) update(title string) {
@@ -43,7 +43,7 @@ func (c *Channel) createChannel() {
 		ParentID: ParentID,
 	})
 	if err != nil {
-		log.Error("create discord channel", err)
+		log.Error("create discord channel ", err)
 		return
 	}
 

@@ -85,8 +85,9 @@ func getDiscordID(event *linebot.Event) Channel {
 
 	c := Channel{
 		LineID: lid,
+		Title:  title,
 	}
-	c.ByLineID()
+	c.byLineID()
 	if c.Title != title {
 		c.update(title)
 		_, err := discord.ChannelEdit(c.DiscordID, title)

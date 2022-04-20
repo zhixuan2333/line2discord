@@ -157,8 +157,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	var c Channel
-	c.ByDiscordID(m.ChannelID)
+	c := Channel{
+		DiscordID: m.ChannelID,
+	}
+	c.byDiscordID()
 	if c.LineID == "" {
 		m, err := discord.ChannelMessageSendComplex(m.ChannelID, &discordgo.MessageSend{
 			Embed: &discordgo.MessageEmbed{
