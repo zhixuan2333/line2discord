@@ -183,14 +183,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				// TODO: Change to use mimetype
 				switch ct[len(ct)-1] {
 				case "jpg", "jpeg", "png", "gif":
-					_, err := LineBot.PushMessage(c.LineID, linebot.NewImageMessage(v.URL, v.URL+preview)).Do()
+					_, err := LineBot.PushMessage(c.LineID, linebot.NewTextMessage("from: "+m.Author.Username), linebot.NewImageMessage(v.URL, v.URL+preview)).Do()
 					if err != nil {
 						log.Error("Send line Image", err)
 					}
 					ToLine(c.LineID, c.DiscordID, "image")
 
 				case "mp4", "webm", "mkv", "flv", "avi", "mov", "wmv", "mpg", "mpeg":
-					_, err := LineBot.PushMessage(c.LineID, linebot.NewVideoMessage(v.URL, v.URL+preview)).Do()
+					_, err := LineBot.PushMessage(c.LineID, linebot.NewTextMessage("from: "+m.Author.Username), linebot.NewVideoMessage(v.URL, v.URL+preview)).Do()
 					if err != nil {
 						log.Error("Send line video", err)
 					}
@@ -198,7 +198,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 				// TODO: Audio length
 				case "m4a":
-					_, err := LineBot.PushMessage(c.LineID, linebot.NewAudioMessage(v.URL, v.Size)).Do()
+					_, err := LineBot.PushMessage(c.LineID, linebot.NewTextMessage("from: "+m.Author.Username), linebot.NewAudioMessage(v.URL, v.Size)).Do()
 					if err != nil {
 						log.Error("Send line audio", err)
 					}
@@ -206,7 +206,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 				// if is not image or video then send url
 				default:
-					_, err := LineBot.PushMessage(c.LineID, linebot.NewTextMessage(v.URL)).Do()
+					_, err := LineBot.PushMessage(c.LineID, linebot.NewTextMessage("from: "+m.Author.Username), linebot.NewTextMessage(v.URL)).Do()
 					if err != nil {
 						log.Error("Send line file", err)
 					}
@@ -217,7 +217,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 	if m.Content != "" {
-		_, err = LineBot.PushMessage(c.LineID, linebot.NewTextMessage(m.Content)).Do()
+		_, err = LineBot.PushMessage(c.LineID, linebot.NewTextMessage(m.Author.Username+": "+m.Content)).Do()
 		if err != nil {
 			log.Error("Send line message", err)
 		}
