@@ -18,6 +18,7 @@ func (c *Channel) DiscordSendMessage(Author, message string) error {
 	profile, err := LineBot.GetProfile(Author).Do()
 	if err != nil {
 		log.Error("Get line profile", err)
+		log.Error("Maybe user not follow bot")
 		return err
 	}
 	_, err = discord.ChannelMessageSendComplex(c.DiscordID, &discordgo.MessageSend{
@@ -52,6 +53,7 @@ func (c *Channel) DiscordSendFile(Author, messageID string) error {
 	profile, err := LineBot.GetProfile(Author).Do()
 	if err != nil {
 		log.Error("Get line profile", err)
+		log.Error("Maybe user not follow bot")
 		return err
 	}
 
@@ -106,6 +108,7 @@ func (c *Channel) DiscordSendSticker(Author, message string) error {
 	profile, err := LineBot.GetProfile(Author).Do()
 	if err != nil {
 		log.Error("Get line profile", err)
+		log.Error("Maybe user not follow bot")
 		return err
 	}
 	_, err = discord.ChannelMessageSendComplex(c.DiscordID, &discordgo.MessageSend{

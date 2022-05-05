@@ -32,7 +32,7 @@ See [quickstart.md](./docs/quickstart.md)
 ## features
 
 ✅ DM
-✅ Group
+⚠️ Group (Can't get user profile when user not follow bot)
 ⚠️ ChatRoom (Not Test)
 
 -   Line --> Discord
