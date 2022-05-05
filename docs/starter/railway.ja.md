@@ -8,7 +8,7 @@
 
 ↓ のボタンをクリックして、Railway にデプロイしてください。
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template/rvH-WB?referralCode=l7uav7)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template/rvH-WB?referralCode=zhixuan)
 
 環境変数については、[Configure L2D](../quickstart.ja.md#構成) を参照してください。:
 

@@ -6,7 +6,7 @@
 
 ## container and Database
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template/rvH-WB?referralCode=l7uav7)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template/rvH-WB?referralCode=zhixuan)
 
 About the environment variables:
 
